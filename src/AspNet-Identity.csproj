@@ -119,7 +119,8 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ContaController.cs" />
-    <Compile Include="CustomPasswordValidator.cs" />
+    <Compile Include="Identity\AccountEmailConfirmation.cs" />
+    <Compile Include="Identity\CustomPasswordValidator.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

@@ -6,8 +6,6 @@ using System;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
-using System.Linq;
 
 namespace AspNet_Identity.Controllers
 {
@@ -59,11 +57,40 @@ namespace AspNet_Identity.Controllers
 
             var result = await UserManager.CreateAsync(novoUsuario, request.Senha);
             if (result.Succeeded)
-                return Ok();
+            {
+                IdETokenDeConfirmacao retornoFake = await EnviarEmailDeConfirmacaoAsync(novoUsuario).ConfigureAwait(false);
+                return Ok(retornoFake);
+            }
 
 
             AddToModelState(result);
             return BadRequest(ModelState);
+        }
+
+        [HttpPost]
+        [Route("confirmar")]
+        public async Task<IHttpActionResult> Confirmar(IdETokenDeConfirmacao idETokenDeConfirmacao)
+        {
+
+            if (idETokenDeConfirmacao == null || idETokenDeConfirmacao.Id == null || idETokenDeConfirmacao.Token == null)
+                return BadRequest();
+
+            var resultado = await UserManager.ConfirmEmailAsync(idETokenDeConfirmacao.Id, idETokenDeConfirmacao.Token);
+            if (resultado.Succeeded)
+                return Ok("Usuario conformado");
+
+
+            return BadRequest();
+        }
+
+        private async Task<IdETokenDeConfirmacao> EnviarEmailDeConfirmacaoAsync(Usuario usuario)
+        {
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(usuario.Id);
+
+            // Em um uso real enviar um link além do código                        
+            await UserManager.SendEmailAsync(usuario.Id, "Confirmação de e-mail", $"Confirme seu e-mail para poder utilizar a aplicação. Use esse token {token}");
+
+            return new IdETokenDeConfirmacao() { Id = usuario.Id, Token = token };
         }
 
         private void AddToModelState(IdentityResult result)
@@ -74,4 +101,12 @@ namespace AspNet_Identity.Controllers
             }
         }
     }
+
+
+    public class IdETokenDeConfirmacao
+    {
+        public string Id { get; set; }
+        public string Token { get; set; }
+    }
+
 }

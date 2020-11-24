@@ -1,4 +1,5 @@
-﻿using AspNet_Identity.Models;
+﻿using AspNet_Identity.Identity;
+using AspNet_Identity.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
@@ -29,13 +30,17 @@ namespace AspNet_Identity
                     var userStore = contextoOwin.Get<IUserStore<Usuario>>();
                     var userManager = new UserManager<Usuario>(userStore);
 
-
                     userManager.UserValidator = new UserValidator<Usuario>(userManager) { RequireUniqueEmail = true };
-
                     userManager.PasswordValidator = new CustomPasswordValidator();
 
+                    userManager.EmailService = new AccountEmailConfirmation();
 
 
+                    // Configuração do provider que será utilizado para gerar o token
+                    var dataProtectionProvider = opcoes.DataProtectionProvider;
+                    var dataProtectionProviderCreated = dataProtectionProvider.Create("teste curso alura");
+
+                    userManager.UserTokenProvider = new DataProtectorTokenProvider<Usuario>(dataProtectionProviderCreated);
 
                     return userManager;
                 });
