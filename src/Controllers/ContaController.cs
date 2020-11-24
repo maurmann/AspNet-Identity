@@ -2,8 +2,12 @@
 using AspNet_Identity.RequestModels;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using System;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.ModelBinding;
+using System.Linq;
 
 namespace AspNet_Identity.Controllers
 {
@@ -35,7 +39,7 @@ namespace AspNet_Identity.Controllers
 
         [HttpPost]
         [Route("registrar")]
-        public IHttpActionResult Registrar(ContaRegistrarRequest request)
+        public async Task<IHttpActionResult> Registrar(ContaRegistrarRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
@@ -47,10 +51,21 @@ namespace AspNet_Identity.Controllers
                 NomeCompleto = request.NomeCompleto
             };
 
-            UserManager.Create(novoUsuario, request.Senha);
+            var result = await UserManager.CreateAsync(novoUsuario, request.Senha);
+            if (result.Succeeded)
+                return Ok();
 
-            return Ok();
+
+            AddToModelState(result);
+            return BadRequest(ModelState);
         }
 
+        private void AddToModelState(IdentityResult result)
+        {
+            foreach (var item in result.Errors)
+            {
+                ModelState.AddModelError("Identity Error", item);
+            }
+        }
     }
 }
