@@ -42,10 +42,10 @@ namespace AspNet_Identity.Controllers
         public async Task<IHttpActionResult> Registrar(ContaRegistrarRequest request)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
 
-            var usuario = UserManager.FindByEmailAsync(request.Email);
+            var usuario = await UserManager.FindByEmailAsync(request.Email);
             if (usuario != null)
                 return BadRequest("Usuário já cadastrado!");
 

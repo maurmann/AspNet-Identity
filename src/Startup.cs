@@ -30,10 +30,12 @@ namespace AspNet_Identity
                     var userManager = new UserManager<Usuario>(userStore);
 
 
-                    var userValidator = new UserValidator<Usuario>(userManager);
-                    userValidator.RequireUniqueEmail = true;
+                    userManager.UserValidator = new UserValidator<Usuario>(userManager) { RequireUniqueEmail = true };
 
-                    userManager.UserValidator = userValidator;
+                    userManager.PasswordValidator = new CustomPasswordValidator();
+
+
+
 
                     return userManager;
                 });
