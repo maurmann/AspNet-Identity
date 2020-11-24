@@ -1,7 +1,8 @@
 ﻿using AspNet_Identity.Models;
 using AspNet_Identity.RequestModels;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
+using System.Web;
 using System.Web.Http;
 
 namespace AspNet_Identity.Controllers
@@ -10,6 +11,28 @@ namespace AspNet_Identity.Controllers
     public class ContaController : ApiController
     {
 
+        private UserManager<Usuario> userManager;
+
+        public UserManager<Usuario> UserManager
+        {
+            get
+            {
+                if (userManager == null)
+                {
+                    var contextOwin = HttpContext.Current.GetOwinContext();
+                    userManager = contextOwin.GetUserManager<UserManager<Usuario>>();
+                }
+                return userManager;
+            }
+
+            set
+            {
+                userManager = value;
+            }
+
+        }
+
+
         [HttpPost]
         [Route("registrar")]
         public IHttpActionResult Registrar(ContaRegistrarRequest request)
@@ -17,16 +40,14 @@ namespace AspNet_Identity.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            var dbContext = new IdentityDbContext<Usuario>("DefaultConnection");
-            var userStore = new UserStore<Usuario>(dbContext);
-            var userManager = new UserManager<Usuario>(userStore);
+            var novoUsuario = new Usuario
+            {
+                Email = request.Email,
+                UserName = request.UserName,
+                NomeCompleto = request.NomeCompleto
+            };
 
-            var novoUsuario = new Usuario();
-            novoUsuario.Email = request.Email;
-            novoUsuario.UserName = request.UserName;
-            novoUsuario.NomeCompleto = request.NomeCompleto;
-
-            userManager.Create(novoUsuario, request.Senha);
+            UserManager.Create(novoUsuario, request.Senha);
 
             return Ok();
         }
