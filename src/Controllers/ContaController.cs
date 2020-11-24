@@ -44,6 +44,12 @@ namespace AspNet_Identity.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
+
+            var usuario = UserManager.FindByEmailAsync(request.Email);
+            if (usuario != null)
+                return BadRequest("Usuário já cadastrado!");
+
+
             var novoUsuario = new Usuario
             {
                 Email = request.Email,

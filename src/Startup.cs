@@ -27,7 +27,15 @@ namespace AspNet_Identity
                 (opcoes, contextoOwin) =>
                 {
                     var userStore = contextoOwin.Get<IUserStore<Usuario>>();
-                    return new UserManager<Usuario>(userStore);
+                    var userManager = new UserManager<Usuario>(userStore);
+
+
+                    var userValidator = new UserValidator<Usuario>(userManager);
+                    userValidator.RequireUniqueEmail = true;
+
+                    userManager.UserValidator = userValidator;
+
+                    return userManager;
                 });
 
         }
