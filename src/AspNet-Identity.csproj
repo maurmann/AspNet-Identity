@@ -119,6 +119,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\ContaController.cs" />
+    <Compile Include="Controllers\ProtegidoController.cs" />
     <Compile Include="Identity\AccountEmailConfirmation.cs" />
     <Compile Include="Identity\CustomPasswordValidator.cs" />
     <Compile Include="Global.asax.cs">
@@ -127,6 +128,7 @@
     <Compile Include="Models\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestModels\ContaRegistrarRequest.cs" />
+    <Compile Include="RequestModels\LoginRequest.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

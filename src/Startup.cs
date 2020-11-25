@@ -45,6 +45,15 @@ namespace AspNet_Identity
                     return userManager;
                 });
 
+            builder.CreatePerOwinContext<SignInManager<Usuario, string>>(
+                (opcoes, contextoOwin) =>
+                {
+                    var userManager = contextoOwin.Get<UserManager<Usuario>>();
+                    return new SignInManager<Usuario, string>(userManager, contextoOwin.Authentication);
+                });
+
+
+
         }
     }
 }

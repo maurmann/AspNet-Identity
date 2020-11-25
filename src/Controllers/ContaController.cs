@@ -31,8 +31,33 @@ namespace AspNet_Identity.Controllers
             {
                 userManager = value;
             }
-
         }
+
+
+
+        private SignInManager<Usuario, string> signInManager;
+
+        public SignInManager<Usuario, string> SignInManager
+        {
+            get
+            {
+                if (signInManager == null)
+                {
+                    var contextOwin = HttpContext.Current.GetOwinContext();
+                    signInManager = contextOwin.GetUserManager<SignInManager<Usuario, string>>();
+                }
+                return signInManager;
+            }
+
+            set
+            {
+                signInManager = value;
+            }
+        }
+
+
+
+
 
 
         [HttpPost]
@@ -83,6 +108,53 @@ namespace AspNet_Identity.Controllers
             return BadRequest();
         }
 
+        [HttpPost]
+        [Route("login")]
+        public async Task<IHttpActionResult> Login(LoginRequest loginRequest)
+        {
+
+            if (ModelState.IsValid)
+            {
+                var usuario = await UserManager.FindByEmailAsync(loginRequest.Email);
+                if (usuario == null)
+                    return BadRequest("Usuário inválido");
+
+
+
+                var signInResult = await SignInManager.PasswordSignInAsync(usuario.UserName, loginRequest.Password, isPersistent: false, shouldLockout: false);
+
+
+                // Idealmente não retornar informações nos status lockedout, requiresverification
+                // Alternativa enviar e-mail para o usuário informando o ocorrido
+
+                switch (signInResult)
+                {
+                    case SignInStatus.Success:
+                        return Ok();
+                        break;
+                    case SignInStatus.LockedOut:
+                        return BadRequest("Usuário bloqueado");
+                        break;
+                    case SignInStatus.RequiresVerification:
+                        return BadRequest("Conta não confirmada");
+                        break;
+                    case SignInStatus.Failure:
+                        return BadRequest("Não foi possível autenticar com o usuário e senha informados");
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("");
+                        break;
+                }
+
+
+            }
+
+            return BadRequest();
+
+        }
+
+
+
         private async Task<IdETokenDeConfirmacao> EnviarEmailDeConfirmacaoAsync(Usuario usuario)
         {
             var token = await UserManager.GenerateEmailConfirmationTokenAsync(usuario.Id);
@@ -108,5 +180,8 @@ namespace AspNet_Identity.Controllers
         public string Id { get; set; }
         public string Token { get; set; }
     }
+
+
+
 
 }
