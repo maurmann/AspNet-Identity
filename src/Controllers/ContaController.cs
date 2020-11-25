@@ -119,8 +119,6 @@ namespace AspNet_Identity.Controllers
                 if (usuario == null)
                     return BadRequest("Usuário inválido");
 
-
-
                 var signInResult = await SignInManager.PasswordSignInAsync(usuario.UserName, loginRequest.Password, isPersistent: false, shouldLockout: false);
 
 
@@ -130,6 +128,7 @@ namespace AspNet_Identity.Controllers
                 switch (signInResult)
                 {
                     case SignInStatus.Success:
+                        
                         return Ok();
                         break;
                     case SignInStatus.LockedOut:

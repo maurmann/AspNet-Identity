@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Owin;
 using System.Data.Entity;
+using Microsoft.Owin.Security.Cookies;
 
 [assembly: OwinStartup(typeof(AspNet_Identity.Startup))]
 namespace AspNet_Identity
@@ -52,6 +53,10 @@ namespace AspNet_Identity
                     return new SignInManager<Usuario, string>(userManager, contextoOwin.Authentication);
                 });
 
+            builder.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationType = DefaultAuthenticationTypes.ExternalBearer   // mudar para bearer token
+            }); 
 
 
         }
