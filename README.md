@@ -12,3 +12,4 @@ Vimos que para instalar o AspNet Identity em um novo projeto basta usar o comand
 Install-package Microsoft.AspNet.Identity.Core -Version 2.2.1
 Install-package Microsoft.AspNet.Identity.EntityFramework -Version 2.2.1
 
+TODO: Alterar para não utilizar MVC, trabalhar com Oauth e token bearer
